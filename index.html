@@ -9,6 +9,42 @@
 <body>
     <script>
         
+            const Gameboard= (() => {
+                const board=["","","","","","","","",""]
+
+                const update= (index,marker) => {
+                    if (index >= 0 && index < board.length && board[index] === "") {
+                        board[index] = marker;
+                    } else {
+        console.log("Invalid move or spot already taken.");
+    }
+                };
+                const reset = () => {
+                    for (let i = 0;i<board.length;i++){
+                        board[i] = ""
+                    }
+                };
+                const getboard=() => [...board]
+                return {update, reset,getboard}
+            })();
+            
+            function createPlayer(playername){
+                const player =playername
+                let marker =""
+                const chooseMarker=(newmarker) => { 
+                    if (newmarker==="X" || newmarker==="O") {
+                        marker = newmarker;
+                        return `Marker set to ${newMarker}`;
+                    } else {
+                        console.log("Invalid marker! Please choose 'X' or 'O'.");
+                    }
+                    
+                }
+                const getInfo = () => ({player, marker});
+                return {choosemarker, player,getInfo}
+            }
+        
+
     </script>
 </body>
 </html>
