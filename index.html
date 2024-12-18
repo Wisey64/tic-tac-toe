@@ -8,13 +8,15 @@
 </head>
 <body>
     <script>
-        
+            let gameOver = false;
             const Gameboard= (() => {
                 const board=["","","","","","","","",""]
 
                 const update= (index,marker) => {
+                    console.log(`Attempting to update index ${index} with marker ${marker}`);
                     if (index >= 0 && index < board.length && board[index] === "") {
                         board[index] = marker;
+                        console.log(`Board updated: ${board}`);
                     } else {
         console.log("Invalid move or spot already taken.");
     }
@@ -63,11 +65,90 @@
            for(let combo of winningCombo) {
             const [a, b ,c] = combo;
             if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                gameOver = true
                 return board[a]
             }
            }
            return null;
            }
+           const checkTie = () => {
+    const board = Gameboard.getboard();
+    // If all spots are filled and no winner, it's a tie
+    if (board.every(spot => spot !== "") && !checkWinner()) {
+        gameOver = true;
+        return true; // 
+    }
+    return false;
+};
+
+           const turns = (() => {
+    let currentMarker = "";
+
+    const randomizeFirstTurn = () => {
+        currentMarker = Math.random() < 0.5 ? "X" : "O";
+        return currentMarker;
+    };
+
+    const switchTurn = () => {
+        currentMarker = currentMarker === "X" ? "O" : "X";
+        return currentMarker;
+    };
+
+    const getCurrentMarker = () => currentMarker;
+
+    const getCurrentPlayer = (player1, player2) => {
+        return player1.getInfo().marker === currentMarker ? player1 : player2;
+    };
+
+    return { randomizeFirstTurn, switchTurn, getCurrentMarker, getCurrentPlayer };
+})();
+
+// Randomize the first turn when the game starts
+turns.randomizeFirstTurn();
+console.log(`First turn: ${turns.getCurrentMarker()}`);
+
+const playTurn = (index) => {
+    if (gameOver) {
+        console.log("Game is over! Restart to play again.");
+        return;
+    }
+    const currentMarker = turns.getCurrentMarker(); // Now should have "X" or "O"
+    console.log(`Playing turn for marker ${currentMarker} at index ${index}`);
+    const boardBeforeUpdate = Gameboard.getboard();
+    Gameboard.update(index, currentMarker);
+
+    const boardAfterUpdate = Gameboard.getboard();
+    console.log(`Board after update: ${boardAfterUpdate}`);
+    printBoard();  // Print the board after every update
+
+
+    if (JSON.stringify(boardBeforeUpdate) !== JSON.stringify(boardAfterUpdate)) {
+        const winner = checkWinner();
+        if (winner) {
+            console.log(`${currentMarker} wins!`);
+            printBoard();
+            return;
+        }
+        if (checkTie()) {
+            console.log("It's a tie!");
+            printBoard();
+            return;
+        }
+        turns.switchTurn(); // Switch the turn if no winner yet
+        console.log(`Next turn: ${turns.getCurrentMarker()}`);
+    } else {
+        console.log("Invalid move, try again.");
+    }
+};
+const resetGame = () => {
+    Gameboard.reset();
+    gameOver = false;
+    turns.randomizeFirstTurn();
+    console.log("Game reset. Starting new game...");
+    printBoard();
+};
+
+
           
        
   
