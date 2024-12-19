@@ -7,10 +7,22 @@
     <title>Document</title>
 </head>
 <body>
+    <h1>tic tac toe</h1>
+    <div class="container">
+
+    </div>
     <script>
             let gameOver = false;
             const Gameboard= (() => {
                 const board=["","","","","","","","",""]
+
+                const container= document.querySelector(".container")
+                board.forEach(element => {
+                    const gcell= document.createElement("div")
+                    gcell.classList.add("gcell")
+                    container.appendChild(gcell) })
+                
+                
 
                 const update= (index,marker) => {
                     console.log(`Attempting to update index ${index} with marker ${marker}`);
@@ -68,8 +80,8 @@
                 gameOver = true
                 return board[a]
             }
-           }
-           return null;
+           }            
+           return null; 
            }
            const checkTie = () => {
     const board = Gameboard.getboard();
@@ -147,6 +159,7 @@ const resetGame = () => {
     console.log("Game reset. Starting new game...");
     printBoard();
 };
+
 
 
           
