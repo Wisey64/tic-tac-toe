@@ -15,10 +15,10 @@
             <label for="name">Player Name</label>
             <input type="text" name="name" id="name">
             <p class="radiopara">please select your marker</p>
-            <input type="radio" name="markerx" id="markerx">
-            <label for="markerx">X</label>
-            <input type="radio" name="markero" id="markero">
-            <label for="markero">O</label>
+            <input type="radio" name="marker" id="markerx">
+            <label for="markerx" class="X">X</label>
+            <input type="radio" name="marker" id="markero">
+            <label for="markero" class="0">O</label>
             <button class="submit" type="submit">start</button>
         </form>
     </dialog>
@@ -39,13 +39,32 @@
                 const submitbtn=document.querySelector(".submit")
                 submitbtn.addEventListener("click",(event) => {
                     event.preventDefault(); // Prevent the default form submission behavior
+                    
+                    function getinput(){
+                        const pname=document.getElementById("name").value;
+                        const selectedRadio = document.querySelector('input[name="marker"]:checked');
+                        if (selectedRadio) {
+        
+                        // Get the text content of the associated label
+                        const choosenmarker = selectedRadio.parentNode.textContent.trim();
+                        const player =createPlayer(pname)
+                        player.chooseMarker(choosenmarker)
+                        return player
+                        
+                        
+
+                    }else{
+                        return null;
+                    }}
+                    const player1=getinput()
+
                     const newdiv= document.createElement("div")
                     newdiv.classList.add("container")
                     
                     document.body.appendChild(newdiv)
                     document.body.removeChild(openbtn)
 
-        board.forEach(element => {
+                board.forEach(element => {
                     const gcell= document.createElement("div")
                     gcell.classList.add("gcell")
                     newdiv.appendChild(gcell) })
@@ -56,8 +75,6 @@
                 })
                 
                 
-                
-
                 const update= (index,marker) => {
                     console.log(`Attempting to update index ${index} with marker ${marker}`);
                     if (index >= 0 && index < board.length && board[index] === "") {
@@ -80,6 +97,8 @@
                 const player =playername
                 let marker =""
                 const chooseMarker=(newmarker) => { 
+                    
+                    
                     if (newmarker==="X" || newmarker==="O") {
                         marker = newmarker;
                         return `Marker set to ${newmarker}`;
@@ -193,6 +212,8 @@ const resetGame = () => {
     console.log("Game reset. Starting new game...");
     printBoard();
 };
+
+
 
 
 
