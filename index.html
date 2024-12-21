@@ -8,19 +8,53 @@
 </head>
 <body>
     <h1>tic tac toe</h1>
-    <div class="container">
+    
+    <button class="open">Start The Game!</button>
+    <dialog class="modal">
+        <form action="">
+            <label for="name">Player Name</label>
+            <input type="text" name="name" id="name">
+            <p class="radiopara">please select your marker</p>
+            <input type="radio" name="markerx" id="markerx">
+            <label for="markerx">X</label>
+            <input type="radio" name="markero" id="markero">
+            <label for="markero">O</label>
+            <button class="submit" type="submit">start</button>
+        </form>
+    </dialog>
+    
 
-    </div>
+    
     <script>
+    const openbtn=document.querySelector(".open")
+    const modal=document.querySelector(".modal")
+
+    openbtn.addEventListener("click",() => {
+        modal.showModal()
+    })
+
             let gameOver = false;
             const Gameboard= (() => {
                 const board=["","","","","","","","",""]
+                const submitbtn=document.querySelector(".submit")
+                submitbtn.addEventListener("click",(event) => {
+                    event.preventDefault(); // Prevent the default form submission behavior
+                    const newdiv= document.createElement("div")
+                    newdiv.classList.add("container")
+                    
+                    document.body.appendChild(newdiv)
+                    document.body.removeChild(openbtn)
 
-                const container= document.querySelector(".container")
-                board.forEach(element => {
+        board.forEach(element => {
                     const gcell= document.createElement("div")
                     gcell.classList.add("gcell")
-                    container.appendChild(gcell) })
+                    newdiv.appendChild(gcell) })
+                    
+                    modal.close()
+                    
+                
+                })
+                
                 
                 
 
