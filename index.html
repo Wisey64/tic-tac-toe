@@ -72,10 +72,13 @@
 
         // Add event listener to each cell
         gcell.addEventListener("click", () => {
-            if (!gameOver) {
+            if (!gameOver && Gameboard.getboard()[index] === "") {
                 playTurn(index); // Pass the cell index to playTurn
-                gcell.textContent = turns.getCurrentMarker(); // Update cell text
+            }else{
+                console.log("Invalid move or game over.");
             }
+                
+            
         });
     });
 
@@ -90,7 +93,7 @@
                         
                         board[index] = marker;
                         console.log(`Board updated: ${board}`);
-                    } else {
+                    } else { 
         console.log("Invalid move or spot already taken.");
     }
                 };
@@ -171,11 +174,7 @@
 
     const getCurrentMarker = () => currentMarker;
 
-    const getCurrentPlayer = (player1, player2) => {
-        return player1.getInfo().marker === currentMarker ? player1 : player2;
-    };
-
-    return { randomizeFirstTurn, switchTurn, getCurrentMarker, getCurrentPlayer };
+    return { randomizeFirstTurn, switchTurn, getCurrentMarker };
 })();
 
 // Randomize the first turn when the game starts
@@ -187,34 +186,51 @@ const playTurn = (index) => {
         console.log("Game is over! Restart to play again.");
         return;
     }
-    const currentMarker = turns.getCurrentMarker(); // Now should have "X" or "O"
-    console.log(`Playing turn for marker ${currentMarker} at index ${index}`);
+
+    const currentMarker = turns.getCurrentMarker();
+    console.log(`Attempting to play turn for marker ${currentMarker} at index ${index}`);
+
+    // Check if the move is valid
     const boardBeforeUpdate = Gameboard.getboard();
+    if (boardBeforeUpdate[index] !== "") {
+        console.log("Invalid move, spot already taken.");
+        return; // Exit early if the move is invalid
+    }
+
+    // Update the game state (logic layer)
     Gameboard.update(index, currentMarker);
 
-    const boardAfterUpdate = Gameboard.getboard();
-    console.log(`Board after update: ${boardAfterUpdate}`);
-    printBoard();  // Print the board after every update
-
-
-    if (JSON.stringify(boardBeforeUpdate) !== JSON.stringify(boardAfterUpdate)) {
-        const winner = checkWinner();
-        if (winner) {
-            console.log(`${currentMarker} wins!`);
-            printBoard();
-            return;
-        }
-        if (checkTie()) {
-            console.log("It's a tie!");
-            printBoard();
-            return;
-        }
-        turns.switchTurn(); // Switch the turn if no winner yet
-        console.log(`Next turn: ${turns.getCurrentMarker()}`);
-    } else {
-        console.log("Invalid move, try again.");
+    // Synchronize the UI (visual layer)
+    const gcell = document.querySelector(`.gcell[data-index="${index}"]`);
+    if (gcell) {
+        gcell.textContent = currentMarker; // Set the marker on the board
     }
+
+    // Check for a winner or tie
+    const winner = checkWinner();
+    if (winner) {
+        console.log(`${currentMarker} wins!`);
+        printBoard();
+        gameOver = true;
+        return;
+    }
+
+    if (checkTie()) {
+        console.log("It's a tie!");
+        printBoard();
+        gameOver = true;
+        return;
+    }
+
+    // Switch the turn after a valid move
+    turns.switchTurn();
+    console.log(`Next turn: ${turns.getCurrentMarker()}`);
 };
+
+
+   
+
+
 const resetGame = () => {
     Gameboard.reset();
     gameOver = false;
