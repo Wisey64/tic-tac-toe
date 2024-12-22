@@ -15,9 +15,9 @@
             <label for="name">Player Name</label>
             <input type="text" name="name" id="name">
             <p class="radiopara">please select your marker</p>
-            <input type="radio" name="marker" id="markerx">
+            <input type="radio" name="marker" id="markerx" value="X">
             <label for="markerx" class="X">X</label>
-            <input type="radio" name="marker" id="markero">
+            <input type="radio" name="marker" id="markero" value="O">
             <label for="markero" class="0">O</label>
             <button class="submit" type="submit">start</button>
         </form>
@@ -46,8 +46,9 @@
                         if (selectedRadio) {
         
                         // Get the text content of the associated label
-                        const choosenmarker = selectedRadio.parentNode.textContent.trim();
+                        const choosenmarker = selectedRadio.value
                         const player =createPlayer(pname)
+                        console.log(player.chooseMarker(choosenmarker)); // Debugging log
                         player.chooseMarker(choosenmarker)
                         return player
                         
@@ -215,10 +216,6 @@ const resetGame = () => {
 
 
 
-
-
-          
-       
   
 
           
