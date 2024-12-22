@@ -11,23 +11,37 @@
     
     <button class="open">Start The Game!</button>
     <dialog class="modal">
-        <form action="">
+        <form action="" class="modal-form">
             <label for="name">Player Name</label>
-            <input type="text" name="name" id="name">
-            <p class="radiopara">please select your marker</p>
-            <input type="radio" name="marker" id="markerx" value="X">
-            <label for="markerx" class="X">X</label>
-            <input type="radio" name="marker" id="markero" value="O">
-            <label for="markero" class="0">O</label>
-            <button class="submit" type="submit">start</button>
+            <input type="text" name="name" id="name" required>
+            <p class="radiopara">Please select your marker:</p>
+            <div class="radio-container">
+                <input type="radio" name="marker" id="markerx" value="X" required>
+                <label for="markerx" class="X">X</label>
+                <input type="radio" name="marker" id="markero" value="O" required>
+                <label for="markero" class="O">O</label>
+            </div>
+            <button class="submit" type="submit">Start</button>
         </form>
     </dialog>
+    
+    <div class="game-info">
+        <div class="status">
+        </div>
+        
+    </div>
     
 
     
     <script>
     const openbtn=document.querySelector(".open")
     const modal=document.querySelector(".modal")
+    const statusDiv = document.querySelector(".status");
+    const gameinfo = document.querySelector(".game-info")
+    const updateStatus = (message) => {
+    statusDiv.textContent = message;
+};
+
 
     openbtn.addEventListener("click",() => {
         modal.showModal()
@@ -36,35 +50,32 @@
             let gameOver = false;
             const Gameboard= (() => {
                 const board=["","","","","","","","",""]
-                const submitbtn=document.querySelector(".submit")
-                submitbtn.addEventListener("click",(event) => {
-                    event.preventDefault(); // Prevent the default form submission behavior
-                    
-                    function getinput(){
-                        const pname=document.getElementById("name").value;
-                        const selectedRadio = document.querySelector('input[name="marker"]:checked');
-                        if (selectedRadio) {
-        
-                        // Get the text content of the associated label
-                        const choosenmarker = selectedRadio.value
-                        const player =createPlayer(pname)
-                        player.chooseMarker(choosenmarker)
-                        return player
-                        
-                        
+                const submitbtn = document.querySelector(".submit");
+submitbtn.addEventListener("click", (event) => {
+    event.preventDefault(); // Prevent the default form submission behavior
 
-                    }else{
-                        return null;
-                    }}
-                    const player1=getinput()
+    // Get player input and marker
+    const pname = document.getElementById("name").value.trim();
+    const selectedRadio = document.querySelector('input[name="marker"]:checked');
 
-                    const newdiv= document.createElement("div")
-                    newdiv.classList.add("container")
-                    
-                    document.body.appendChild(newdiv)
-                    document.body.removeChild(openbtn)
+    // Form validation
+    if (!pname || !selectedRadio) {
+        alert("Please fill out your name and select a marker!");
+        return; // Stop execution if the form is invalid
+    }
 
-                    board.forEach((_, index) => {
+    const choosenmarker = selectedRadio.value;
+    const player = createPlayer(pname);
+    player.chooseMarker(choosenmarker);
+
+    // Create game board container
+    const newdiv = document.createElement("div");
+    newdiv.classList.add("container");
+
+    document.body.appendChild(newdiv);
+    document.body.removeChild(openbtn);
+
+    board.forEach((_, index) => {
         const gcell = document.createElement("div");
         gcell.classList.add("gcell");
         gcell.dataset.index = index; // Store the index for identification
@@ -74,16 +85,41 @@
         gcell.addEventListener("click", () => {
             if (!gameOver && Gameboard.getboard()[index] === "") {
                 playTurn(index); // Pass the cell index to playTurn
-            }else{
+            } else {
                 console.log("Invalid move or game over.");
             }
-                
-            
         });
     });
 
     modal.close();
+
+    // Create and handle restart button
+    const restartButton = document.createElement("button");
+    restartButton.textContent = "Restart Game";
+    restartButton.classList.add("restart", "open");
+    gameinfo.appendChild(restartButton);
+
+    restartButton.addEventListener("click", () => {
+        Gameboard.reset();
+        gameOver = false;
+        turns.randomizeFirstTurn();
+        updateStatus(""); // Clear the status message
+        console.log("Game reset. Starting new game...");
+
+        // Clear the UI board
+        const cells = document.querySelectorAll(".gcell");
+        cells.forEach(cell => {
+            cell.textContent = "";
+        });
+    });
+
 });
+
+// Open the modal when the open button is clicked
+document.querySelector('.open').addEventListener('click', () => {
+    modal.showModal();
+});
+
                 
                 
                 const update= (index,marker) => {
@@ -212,6 +248,7 @@ const playTurn = (index) => {
         console.log(`${currentMarker} wins!`);
         printBoard();
         gameOver = true;
+        updateStatus(`${currentMarker} won!`);
         return;
     }
 
@@ -219,6 +256,7 @@ const playTurn = (index) => {
         console.log("It's a tie!");
         printBoard();
         gameOver = true;
+        updateStatus("It's a tie!");
         return;
     }
 
@@ -228,7 +266,6 @@ const playTurn = (index) => {
 };
 
 
-   
 
 
 const resetGame = () => {
@@ -238,6 +275,25 @@ const resetGame = () => {
     console.log("Game reset. Starting new game...");
     printBoard();
 };
+//form validation
+const form = document.querySelector('.modal-form');
+
+form.addEventListener('submit', (event) => {
+    const nameInput = document.getElementById('name');
+    const selectedMarker = document.querySelector('input[name="marker"]:checked');
+
+    if (!nameInput.value || !selectedMarker) {
+        event.preventDefault(); // Prevent the form from closing
+        alert("Please fill out your name and select a marker!");
+    } else {
+        modal.close(); // Close the modal only if the form is valid
+    }
+});
+
+
+document.querySelector('.open').addEventListener('click', () => {
+    modal.showModal();
+});
 
 
 
