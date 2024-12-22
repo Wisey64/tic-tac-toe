@@ -23,4 +23,9 @@ h1{
 }
 .gcell{
     border: solid black 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    
 }

@@ -48,7 +48,6 @@
                         // Get the text content of the associated label
                         const choosenmarker = selectedRadio.value
                         const player =createPlayer(pname)
-                        console.log(player.chooseMarker(choosenmarker)); // Debugging log
                         player.chooseMarker(choosenmarker)
                         return player
                         
@@ -65,20 +64,30 @@
                     document.body.appendChild(newdiv)
                     document.body.removeChild(openbtn)
 
-                board.forEach(element => {
-                    const gcell= document.createElement("div")
-                    gcell.classList.add("gcell")
-                    newdiv.appendChild(gcell) })
-                    
-                    modal.close()
-                    
-                
-                })
+                    board.forEach((_, index) => {
+        const gcell = document.createElement("div");
+        gcell.classList.add("gcell");
+        gcell.dataset.index = index; // Store the index for identification
+        newdiv.appendChild(gcell);
+
+        // Add event listener to each cell
+        gcell.addEventListener("click", () => {
+            if (!gameOver) {
+                playTurn(index); // Pass the cell index to playTurn
+                gcell.textContent = turns.getCurrentMarker(); // Update cell text
+            }
+        });
+    });
+
+    modal.close();
+});
                 
                 
                 const update= (index,marker) => {
                     console.log(`Attempting to update index ${index} with marker ${marker}`);
                     if (index >= 0 && index < board.length && board[index] === "") {
+                        
+                        
                         board[index] = marker;
                         console.log(`Board updated: ${board}`);
                     } else {
