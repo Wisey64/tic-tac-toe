@@ -8,13 +8,17 @@
 </head>
 <body>
     <h1>tic tac toe</h1>
-    
+
     <button class="open">Start The Game!</button>
     <dialog class="modal">
         <form action="" class="modal-form">
-            <label for="name">Player Name</label>
-            <input type="text" name="name" id="name" required>
-            <p class="radiopara">Please select your marker:</p>
+            <label for="name1">Player 1 Name</label>
+            <input type="text" name="name" id="name1" required>
+
+            <label for="name2">Player 2 Name</label>
+            <input type="text" name="name" id="name2" required>
+
+            <p class="radiopara">Player 1, select your marker:</p>
             <div class="radio-container">
                 <input type="radio" name="marker" id="markerx" value="X" required>
                 <label for="markerx" class="X">X</label>
@@ -24,287 +28,225 @@
             <button class="submit" type="submit">Start</button>
         </form>
     </dialog>
-    
+
     <div class="game-info">
         <div class="status">
         </div>
-        
     </div>
-    
 
-    
     <script>
-    const openbtn=document.querySelector(".open")
-    const modal=document.querySelector(".modal")
-    const statusDiv = document.querySelector(".status");
-    const gameinfo = document.querySelector(".game-info")
-    const updateStatus = (message) => {
-    statusDiv.textContent = message;
-};
-
-
-    openbtn.addEventListener("click",() => {
-        modal.showModal()
-    })
-
-            let gameOver = false;
-            const Gameboard= (() => {
-                const board=["","","","","","","","",""]
-                const submitbtn = document.querySelector(".submit");
-submitbtn.addEventListener("click", (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior
-
-    // Get player input and marker
-    const pname = document.getElementById("name").value.trim();
-    const selectedRadio = document.querySelector('input[name="marker"]:checked');
-
-    // Form validation
-    if (!pname || !selectedRadio) {
-        alert("Please fill out your name and select a marker!");
-        return; // Stop execution if the form is invalid
-    }
-
-    const choosenmarker = selectedRadio.value;
-    const player = createPlayer(pname);
-    player.chooseMarker(choosenmarker);
-
-    // Create game board container
-    const newdiv = document.createElement("div");
-    newdiv.classList.add("container");
-
-    document.body.appendChild(newdiv);
-    document.body.removeChild(openbtn);
-
-    board.forEach((_, index) => {
-        const gcell = document.createElement("div");
-        gcell.classList.add("gcell");
-        gcell.dataset.index = index; // Store the index for identification
-        newdiv.appendChild(gcell);
-
-        // Add event listener to each cell
-        gcell.addEventListener("click", () => {
-            if (!gameOver && Gameboard.getboard()[index] === "") {
-                playTurn(index); // Pass the cell index to playTurn
-            } else {
-                console.log("Invalid move or game over.");
-            }
+        const openbtn = document.querySelector(".open");
+        const modal = document.querySelector(".modal");
+        const statusDiv = document.querySelector(".status");
+        const gameinfo = document.querySelector(".game-info");
+        let gameOver = false;
+        //aka show results
+        const updateStatus = (message) => {
+            statusDiv.textContent = message;
+        };
+        
+        //just shows the modal
+        openbtn.addEventListener("click", () => {
+            modal.showModal();
         });
-    });
 
-    modal.close();
+        //creates the game board in an array and handels updating it and reseting
+        const Gameboard = (() => {
+            const board = ["", "", "", "", "", "", "", "", ""];
 
-    // Create and handle restart button
-    const restartButton = document.createElement("button");
-    restartButton.textContent = "Restart Game";
-    restartButton.classList.add("restart", "open");
-    gameinfo.appendChild(restartButton);
-
-    restartButton.addEventListener("click", () => {
-        Gameboard.reset();
-        gameOver = false;
-        turns.randomizeFirstTurn();
-        updateStatus(""); // Clear the status message
-        console.log("Game reset. Starting new game...");
-
-        // Clear the UI board
-        const cells = document.querySelectorAll(".gcell");
-        cells.forEach(cell => {
-            cell.textContent = "";
-        });
-    });
-
-});
-
-// Open the modal when the open button is clicked
-document.querySelector('.open').addEventListener('click', () => {
-    modal.showModal();
-});
-
-                
-                
-                const update= (index,marker) => {
-                    console.log(`Attempting to update index ${index} with marker ${marker}`);
-                    if (index >= 0 && index < board.length && board[index] === "") {
-                        
-                        
-                        board[index] = marker;
-                        console.log(`Board updated: ${board}`);
-                    } else { 
-        console.log("Invalid move or spot already taken.");
-    }
-                };
-                const reset = () => {
-                    for (let i = 0;i<board.length;i++){
-                        board[i] = ""
-                    }
-                };
-                const getboard=() => [...board]
-                return {update, reset,getboard}
-            })();
-            
-            function createPlayer(playername){
-                const player =playername
-                let marker =""
-                const chooseMarker=(newmarker) => { 
-                    
-                    
-                    if (newmarker==="X" || newmarker==="O") {
-                        marker = newmarker;
-                        return `Marker set to ${newmarker}`;
-                    } else {
-                        console.log("Invalid marker! Please choose 'X' or 'O'.");
-                    }
-                    
-                }
-                const getInfo = () => ({player, marker});
-                return {chooseMarker, player,getInfo}
-            }
-            //to help visualize the game in the console
-            const printBoard = () => {
-                const board = Gameboard.getboard();
-
-                for (let i = 0; i < 3; i++) {
-                console.log(board.slice(i * 3, (i + 1) * 3).join(" | "));
-                if (i < 2) console.log("---------");
-                }
-            };
-
-           const checkWinner= () => {
-            const board = Gameboard.getboard();
-            const winningCombo = [
-                [0,1,2],[3,4,5],[6,7,8], //rows
-                [0,3,6],[1,4,7],[2,5,8], //columns
-                [0,4,8],[2,4,6], // diagonals
-           ];
-           for(let combo of winningCombo) {
-            const [a, b ,c] = combo;
-            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                gameOver = true
-                return board[a]
-            }
-           }            
-           return null; 
-           }
-           const checkTie = () => {
-    const board = Gameboard.getboard();
-    // If all spots are filled and no winner, it's a tie
-    if (board.every(spot => spot !== "") && !checkWinner()) {
-        gameOver = true;
-        return true; // 
-    }
-    return false;
-};
-
-           const turns = (() => {
-    let currentMarker = "";
-
-    const randomizeFirstTurn = () => {
-        currentMarker = Math.random() < 0.5 ? "X" : "O";
-        return currentMarker;
+    const update = (index, marker) => {
+                if (index >= 0 && index < board.length && board[index] === "") {
+            board[index] = marker;
+                } else {
+                    console.log("Invalid move or spot already taken.");
+        }
     };
 
-    const switchTurn = () => {
-        currentMarker = currentMarker === "X" ? "O" : "X";
-        return currentMarker;
+    const reset = () => {
+                for (let i = 0; i < board.length; i++) {
+                    board[i] = "";
+                }
     };
 
-    const getCurrentMarker = () => currentMarker;
-
-    return { randomizeFirstTurn, switchTurn, getCurrentMarker };
+            const getboard = () => [...board];
+            return { update, reset, getboard };
 })();
 
-// Randomize the first turn when the game starts
-turns.randomizeFirstTurn();
-console.log(`First turn: ${turns.getCurrentMarker()}`);
+        //creates the player and marker
+        function createPlayer(playerName) {
+            const player = playerName;
+            let marker = "";
 
-const playTurn = (index) => {
-    if (gameOver) {
-        console.log("Game is over! Restart to play again.");
-        return;
+            const chooseMarker = (newMarker) => {
+                if (newMarker === "X" || newMarker === "O") {
+                    marker = newMarker;
+                } else {
+                    
+                }
+    };
+           
+            const getInfo = () => ({ player, marker });
+            return { chooseMarker, getInfo };
+        }
+// as the name says checks for a winner 
+    const checkWinner = () => {
+    const board = Gameboard.getboard();
+            const winningCombo = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6] // Diagonals
+    ];
+
+            for (let combo of winningCombo) {
+                const [a, b, c] = combo;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    gameOver = true;
+            return board[a];
+        }
     }
+    return null;
+};
+
+// checks for a tie :)
+const checkTie = () => {
+            const board = Gameboard.getboard();
+            if (board.every(spot => spot !== "") && !checkWinner()) {
+                gameOver = true;
+                return true;
+            }
+            return false;
+        };
+
+// handels randomizing the first turn, switching turns
+        const turns = (() => {
+            let currentMarker = "";
+
+            const randomizeFirstTurn = () => {
+                currentMarker = Math.random() < 0.5 ? "X" : "O";
+                return currentMarker;
+            };
+
+            const switchTurn = () => {
+                currentMarker = currentMarker === "X" ? "O" : "X";
+                return currentMarker;
+            };
+
+            const getCurrentMarker = () => currentMarker;
+
+            return { randomizeFirstTurn, switchTurn, getCurrentMarker };
+        })();
+
+        turns.randomizeFirstTurn();
+
+
+// basically handels the whole game round
+const playTurn = (index) => {
+            if (gameOver) {
+                console.log("Game is over! Restart to play again.");
+                return;
+            }
 
     const currentMarker = turns.getCurrentMarker();
-    console.log(`Attempting to play turn for marker ${currentMarker} at index ${index}`);
 
-    // Check if the move is valid
-    const boardBeforeUpdate = Gameboard.getboard();
-    if (boardBeforeUpdate[index] !== "") {
-        console.log("Invalid move, spot already taken.");
-        return; // Exit early if the move is invalid
-    }
+            if (Gameboard.getboard()[index] !== "") {
+                console.log("Invalid move, spot already taken.");
+                return;
+            }
 
-    // Update the game state (logic layer)
     Gameboard.update(index, currentMarker);
-
-    // Synchronize the UI (visual layer)
     const gcell = document.querySelector(`.gcell[data-index="${index}"]`);
-    if (gcell) {
-        gcell.textContent = currentMarker; // Set the marker on the board
-    }
+            if (gcell) {
+    gcell.textContent = currentMarker;
+            }
 
-    // Check for a winner or tie
     const winner = checkWinner();
     if (winner) {
-        console.log(`${currentMarker} wins!`);
-        printBoard();
+                updateStatus(`${currentMarker === player1.getInfo().marker ? player1.getInfo().player : player2.getInfo().player} wins!`);
         gameOver = true;
-        updateStatus(`${currentMarker} won!`);
         return;
     }
 
     if (checkTie()) {
-        console.log("It's a tie!");
-        printBoard();
-        gameOver = true;
         updateStatus("It's a tie!");
+        gameOver = true;
         return;
     }
 
-    // Switch the turn after a valid move
     turns.switchTurn();
-    console.log(`Next turn: ${turns.getCurrentMarker()}`);
-};
+        };
 
+        let player1, player2;
+        // ah yes the submit btn the "MVP" in my opinion, handling almost everything UI realeted, getting inputs, validaition, board UI, restart button, you name it!
+        const submitbtn = document.querySelector(".submit");
+        submitbtn.addEventListener("click", (event) => {
+            event.preventDefault();
 
+            const name1 = document.getElementById("name1").value.trim();
+            const name2 = document.getElementById("name2").value.trim();
+            const selectedRadio = document.querySelector('input[name="marker"]:checked');
 
+            if (!name1 || !name2 || !selectedRadio) {
+                alert("Please fill out all fields and select a marker!");
+                return;
+            }
 
-const resetGame = () => {
+            const marker1 = selectedRadio.value;
+            const marker2 = marker1 === "X" ? "O" : "X";
+
+            player1 = createPlayer(name1);
+            player2 = createPlayer(name2);
+
+            player1.chooseMarker(marker1);
+            player2.chooseMarker(marker2);
+
+            const newdiv = document.createElement("div");
+            newdiv.classList.add("container");
+
+            document.body.appendChild(newdiv);
+            document.body.removeChild(openbtn);
+
+            Gameboard.getboard().forEach((_, index) => {
+                const gcell = document.createElement("div");
+                gcell.classList.add("gcell");
+                gcell.dataset.index = index;
+                newdiv.appendChild(gcell);
+
+                gcell.addEventListener("click", () => {
+                    if (!gameOver && Gameboard.getboard()[index] === "") {
+                        playTurn(index);
+                    }
+                });
+            });
+
+            modal.close();
+
+            let restartButton = document.querySelector(".restart");
+            if (!restartButton) {
+                restartButton = document.createElement("button");
+                restartButton.textContent = "Restart Game";
+                restartButton.classList.add("restart", "open");
+                gameinfo.appendChild(restartButton);
+            }
+
+            restartButton.addEventListener("click", () => {
     Gameboard.reset();
     gameOver = false;
-    turns.randomizeFirstTurn();
-    console.log("Game reset. Starting new game...");
-    printBoard();
+                turns.randomizeFirstTurn();
+                updateStatus("");
+
+                const cells = document.querySelectorAll(".gcell");
+                cells.forEach(cell => {
+        cell.textContent = "";
+                });
+    });
+        });
+
+        const resetGame = () => {
+            Gameboard.reset();
+            gameOver = false;
+            turns.randomizeFirstTurn();
+            updateStatus("");
 };
-//form validation
-const form = document.querySelector('.modal-form');
-
-form.addEventListener('submit', (event) => {
-    const nameInput = document.getElementById('name');
-    const selectedMarker = document.querySelector('input[name="marker"]:checked');
-
-    if (!nameInput.value || !selectedMarker) {
-        event.preventDefault(); // Prevent the form from closing
-        alert("Please fill out your name and select a marker!");
-    } else {
-        modal.close(); // Close the modal only if the form is valid
-    }
-});
-
-
-document.querySelector('.open').addEventListener('click', () => {
-    modal.showModal();
-});
-
-
-
-  
-
-          
-
-   
-         
-        
-
     </script>
 </body>
 </html>
